@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Śledzenie paczki InPost</title>
+  <style>
+    /* Podstawowe ustawienia dla body */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center; /* Wyśrodkowanie formularza */
+      align-items: center; /* Wyśrodkowanie formularza */
+      height: 100vh; /* Wysokość całego widoku */
+      box-sizing: border-box;
+      overflow-y: auto; /* Umożliwia przewijanie całej strony */
+    }
+
+    /* Kontener główny */
+    .container {
+      width: 100%;
+      max-width: 600px; /* Maksymalna szerokość */
+      padding: 20px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: center; /* Wyśrodkowanie wewnętrzne formularza */
+      overflow: hidden; /* Ukrywa elementy wykraczające poza kontener */
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    /* Styl dla formularza */
+    #searchForm {
+      display: flex;
+      flex-direction: row; /* Elementy będą ustawione w poziomie */
+      align-items: center; /* Elementy w jednej linii */
+      justify-content: center; /* Wyśrodkowanie formularza */
+      width: 100%;
+    }
+
+    label {
+      font-size: 20px;
+      margin-right: 10px; /* Odstęp między etykietą a inputem */
+      text-align: center; /* Wyśrodkowanie tekstu etykiety */
+    }
+
+    input {
+      padding: 12px;
+      font-size: 18px;
+      width: 100%;
+      max-width: 400px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      margin-right: 10px; /* Odstęp między inputem a przyciskiem */
+      box-sizing: border-box;
+    }
+
+    /* Przycisk */
+    button {
+      padding: 12px;
+      font-size: 18px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 150px; /* Ustalamy szerokość przycisku */
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    /* Stylowanie kontenera boxów */
+    .box-container {
+      margin-top: 30px;
+      width: 100%;
+      padding: 20px 0;
+      box-sizing: border-box;
+      overflow-y: auto; /* Umożliwia przewijanie tylko w tej sekcji */
+      max-height: 400px; /* Maksymalna wysokość dla wyników */
+    }
+
+    /* Stylowanie pojedynczego boxa */
+    .box {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      width: 100%;
+      margin: 10px 0;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start; /* Wyniki nie są wyśrodkowane */
+      box-sizing: border-box;
+    }
+
+    .box h2 {
+      margin: 0;
+      font-size: 24px;
+      color: #333;
+      font-weight: bold;
+    }
+
+    .box p {
+      font-size: 20px;
+      color: #555;
+      margin: 10px 0;
+    }
+
+    .box .date {
+      margin-top: 10px;
+      font-size: 18px;
+      color: #777;
+    }
+
+    /* Responsywność dla mniejszych ekranów */
+    @media (max-width: 600px) {
+      label, input, button {
+        font-size: 16px;
+      }
+
+      .box h2 {
+        font-size: 20px;
+      }
+
+      .box p {
+        font-size: 16px;
+      }
+
+      .box .date {
+        font-size: 14px;
+      }
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Śledzenie paczki InPost</h1>
+    
+    <!-- Formularz wyszukiwania -->
+    <div id="searchForm">
+      <label for="trackingNumber">Podaj numer przesyłki:</label>
+      <input type="text" id="trackingNumber" placeholder="Wpisz numer paczki">
+      <button onclick="trackPackage()">Śledź paczkę</button>
+    </div>
+
+    <div id="result"></div>
+
+    <!-- Boxes for tracking data -->
+    <div id="trackingInfo" class="box-container"></div>
+  </div>
+
+  <script>
+    async function trackPackage() {
+      const trackingNumber = document.getElementById('trackingNumber').value;
+      const resultDiv = document.getElementById('result');
+      const trackingInfoDiv = document.getElementById('trackingInfo');
+
+      if (!trackingNumber) {
+        resultDiv.innerText = "Numer przesyłki nie może być pusty.";
+        return;
+      }
+
+      resultDiv.innerText = "Ładowanie...";
+
+      try {
+        const response = await fetch(`/track?trackingNumber=${trackingNumber}`);
+        const result = await response.json();
+
+        console.log(result); // Debugowanie: Zobaczmy, co zawiera odpowiedź z serwera
+
+        if (result.success) {
+          resultDiv.innerText = '';
+          const trackingData = result.data.split('\n\n'); // Rozdziel dane na podstawie podwójnych nowych linii
+
+          if (trackingData.length > 0) {
+            trackingInfoDiv.innerHTML = ''; // Clear previous results
+
+            // Przetwarzamy dane: co 2 linie (data, status)
+            for (let i = 0; i < trackingData.length; i += 2) {
+              const data = trackingData[i].trim();
+              const status = trackingData[i + 1] ? trackingData[i + 1].trim() : 'Brak informacji';
+
+              const box = document.createElement('div');
+              box.className = 'box';
+              
+              // Data
+              const date = document.createElement('div');
+              date.className = 'date';
+              date.innerText = data; // Wstawiamy datę
+              box.appendChild(date);
+
+              // Status
+              const statusElem = document.createElement('p');
+              statusElem.innerText = status;
+              box.appendChild(statusElem);
+              
+              trackingInfoDiv.appendChild(box);
+            }
+          } else {
+            resultDiv.innerText = "Brak danych o śledzeniu.";
+          }
+        } else {
+          resultDiv.innerText = "Błąd podczas śledzenia paczki: " + result.error;
+        }
+      } catch (error) {
+        resultDiv.innerText = "Wystąpił błąd: " + error.message;
+      }
+    }
+  </script>
+
+</body>
+</html>
