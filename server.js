@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');  // Import CORS
 const puppeteer = require('puppeteer');
 
-// Określenie ścieżki do pamięci podręcznej Puppeteer
+// Ustawienie ścieżki cache
 process.env.PUPPETEER_CACHE_DIR = '/opt/render/.cache/puppeteer';
 
 const app = express();
@@ -15,10 +15,9 @@ app.use(cors());
 app.use(express.static('public'));
 
 async function trackPackage(trackingNumber) {
-  // Uruchomienie Puppeteer z określoną ścieżką do Chromium
   const browser = await puppeteer.launch({
     headless: true,
-    executablePath: '/opt/render/project/.render/chrome/opt/google/chrome/'  // Określamy ścieżkę do Chromium
+    executablePath: '/opt/render/project/.render/chrome/opt/google/chrome/chrome'  // Poprawiona ścieżka
   });
   const page = await browser.newPage();
 
