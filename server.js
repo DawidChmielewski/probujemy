@@ -19,8 +19,12 @@ app.use(express.static('public'));
 async function trackPackage(trackingNumber) {
   const browser = await puppeteer.launch({
     headless: true,
-    executablePath: '/opt/render/project/.render/chrome/opt/google/chrome/chrome'  // Poprawiona ścieżka
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox'
+    ]
   });
+  
   const page = await browser.newPage();
 
   try {
