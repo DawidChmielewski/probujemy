@@ -1,14 +1,13 @@
 const express = require('express');
 const cors = require('cors');  // Import CORS
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-core');
+const chrome = require('chrome-aws-lambda');
 
 // Ustawienie ścieżki cache
 process.env.PUPPETEER_CACHE_DIR = '/opt/render/.cache/puppeteer';
 
 const app = express();
-
-// Use the port provided by the environment (Render will assign a port)
-const port = process.env.PORT || 3000;  // This ensures compatibility if running locally or on Render
+const port = process.env.PORT || 3000;
 
 // Enable CORS for all origins
 app.use(cors());
@@ -19,12 +18,10 @@ app.use(express.static('public'));
 async function trackPackage(trackingNumber) {
   const browser = await puppeteer.launch({
     headless: true,
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox'
-    ]
+    executablePath: await chrome.executablePath,
+    args: chrome.args,
+    defaultViewport: chrome.defaultViewport
   });
-  
   const page = await browser.newPage();
 
   try {
@@ -65,7 +62,6 @@ app.get('/track', async (req, res) => {
   }
 });
 
-// Start the server to listen on the correct port
 app.listen(port, () => {
-  console.log(`Server is running on https://probujemy.onrender.com`);
+  console.log(`Server is running on http://localhost:${port}`);
 });
