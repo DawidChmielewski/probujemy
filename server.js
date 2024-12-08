@@ -18,7 +18,7 @@ async function trackPackage(trackingNumber) {
   // Uruchomienie Puppeteer z określoną ścieżką do Chromium
   const browser = await puppeteer.launch({
     headless: true,
-    executablePath: '/usr/bin/chromium-browser'  // Określamy ścieżkę do Chromium
+    executablePath: '/opt/render/project/.render/chrome/opt/google/chrome/'  // Określamy ścieżkę do Chromium
   });
   const page = await browser.newPage();
 
