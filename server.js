@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');  // Import CORS
-const puppeteer = require('puppeteer-core');
+const puppeteer = require('puppeteer');
+
 const chrome = require('chrome-aws-lambda');
 
 // Ustawienie ścieżki cache
