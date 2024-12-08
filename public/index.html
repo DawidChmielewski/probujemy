@@ -131,8 +131,6 @@
         const response = await fetch(`/track?trackingNumber=${trackingNumber}`);
         const result = await response.json();
 
-        console.log(result);
-
         if (result.success) {
           resultDiv.innerText = '';
           const trackingData = result.data.split('\n\n');

@@ -1,10 +1,9 @@
 const express = require('express');
-const cors = require('cors');  // Import CORS
-const puppeteer = require('puppeteer');
-
+const cors = require('cors'); // Import CORS
+const puppeteer = require('puppeteer-core');
 const chrome = require('chrome-aws-lambda');
 
-// Ustawienie ścieżki cache
+// Set Puppeteer cache directory (for Render's file system)
 process.env.PUPPETEER_CACHE_DIR = '/opt/render/.cache/puppeteer';
 
 const app = express();
@@ -13,7 +12,7 @@ const port = process.env.PORT || 3000;
 // Enable CORS for all origins
 app.use(cors());
 
-// Serve the static HTML files
+// Serve static HTML files
 app.use(express.static('public'));
 
 async function trackPackage(trackingNumber) {
@@ -21,7 +20,7 @@ async function trackPackage(trackingNumber) {
     headless: true,
     executablePath: await chrome.executablePath,
     args: chrome.args,
-    defaultViewport: chrome.defaultViewport
+    defaultViewport: chrome.defaultViewport,
   });
   const page = await browser.newPage();
 
