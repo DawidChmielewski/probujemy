@@ -6,7 +6,9 @@ const puppeteer = require('puppeteer');
 process.env.PUPPETEER_CACHE_DIR = '/opt/render/.cache/puppeteer';
 
 const app = express();
-const port = process.env.PORT || 3000;
+
+// Use the port provided by the environment (Render will assign a port)
+const port = process.env.PORT || 3000;  // This ensures compatibility if running locally or on Render
 
 // Enable CORS for all origins
 app.use(cors());
@@ -59,6 +61,7 @@ app.get('/track', async (req, res) => {
   }
 });
 
+// Start the server to listen on the correct port
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Server is running on https://probujemy.onrender.com`);
 });
